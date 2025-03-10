@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   Typography,
   Grid,
@@ -15,47 +14,20 @@ import {
   Remove as RemoveIcon,
   Delete as DeleteIcon,
 } from '@mui/icons-material';
-
-// TODO: Replace with actual cart state management
-const initialCartItems = [
-  {
-    id: 'sl1',
-    name: 'Smart LED Bulb',
-    price: 29.99,
-    image: 'https://example.com/smart-bulb.jpg',
-    quantity: 2,
-  },
-  {
-    id: 'ss1',
-    name: 'Smart Security Camera',
-    price: 129.99,
-    image: 'https://example.com/security-camera.jpg',
-    quantity: 1,
-  },
-];
+import { useCart } from '../contexts/CartContext';
 
 function Cart() {
-  const [cartItems, setCartItems] = useState(initialCartItems);
+  const navigate = useNavigate();
+  const { 
+    cartItems, 
+    removeFromCart, 
+    updateQuantity,
+    getCartTotal 
+  } = useCart();
 
-  const handleUpdateQuantity = (id, newQuantity) => {
-    if (newQuantity < 1) return;
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
-  };
-
-  const handleRemoveItem = (id) => {
-    setCartItems(items => items.filter(item => item.id !== id));
-  };
-
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-  const shipping = 9.99;
-  const tax = subtotal * 0.1; // 10% tax
+  const shipping = 499; // ₹499
+  const subtotal = getCartTotal();
+  const tax = Math.round(subtotal * 0.18); // 18% GST
   const total = subtotal + shipping + tax;
 
   return (
@@ -65,27 +37,27 @@ function Cart() {
       </Typography>
 
       {cartItems.length === 0 ? (
-        <Box sx={{ textAlign: 'center', py: 4 }}>
+        <div className="text-center py-8">
           <Typography variant="h6" gutterBottom>
             Your cart is empty
           </Typography>
           <Button
             component={RouterLink}
-            to="/"
+            to="/catalog"
             variant="contained"
             sx={{ mt: 2 }}
           >
             Continue Shopping
           </Button>
-        </Box>
+        </div>
       ) : (
-        <div className="cart-grid">
+        <div className="cart-content">
           {/* Cart Items */}
           <div className="cart-items">
             {cartItems.map((item) => (
-              <Box key={item.id} sx={{ 
+              <Box key={item.id} sx={{
                 p: 3,
-                borderBottom: 1, 
+                borderBottom: 1,
                 borderColor: 'divider',
                 '&:last-child': {
                   borderBottom: 0
@@ -106,47 +78,46 @@ function Cart() {
                       {item.name}
                     </Typography>
                     <Typography variant="body1" color="primary">
-                      ${item.price}
+                      ₹{item.price.toLocaleString()}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={3}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'flex-start', sm: 'center' } }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <IconButton
-                        onClick={() =>
-                          handleUpdateQuantity(item.id, item.quantity - 1)
-                        }
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        disabled={item.quantity <= 1}
                       >
                         <RemoveIcon />
                       </IconButton>
                       <TextField
-                        size="small"
                         value={item.quantity}
-                        onChange={(e) =>
-                          handleUpdateQuantity(
-                            item.id,
-                            parseInt(e.target.value) || 1
-                          )
-                        }
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value);
+                          if (!isNaN(value) && value > 0) {
+                            updateQuantity(item.id, value);
+                          }
+                        }}
                         inputProps={{
                           min: 1,
-                          style: { textAlign: 'center' },
+                          style: { textAlign: 'center' }
                         }}
-                        sx={{ width: 60 }}
+                        sx={{ width: '60px', mx: 1 }}
                       />
                       <IconButton
-                        onClick={() =>
-                          handleUpdateQuantity(item.id, item.quantity + 1)
-                        }
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
                       >
                         <AddIcon />
                       </IconButton>
                     </Box>
                   </Grid>
                   <Grid item xs={12} sm={2}>
-                    <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-start', sm: 'flex-end' } }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                        ₹{(item.price * item.quantity).toLocaleString()}
+                      </Typography>
                       <IconButton
+                        onClick={() => removeFromCart(item.id)}
                         color="error"
-                        onClick={() => handleRemoveItem(item.id)}
                       >
                         <DeleteIcon />
                       </IconButton>
@@ -174,7 +145,7 @@ function Cart() {
                     <Typography>Subtotal</Typography>
                   </Grid>
                   <Grid item>
-                    <Typography>${subtotal.toFixed(2)}</Typography>
+                    <Typography>₹{subtotal.toLocaleString()}</Typography>
                   </Grid>
                 </Grid>
                 <Grid container justifyContent="space-between" sx={{ mt: 1 }}>
@@ -182,15 +153,15 @@ function Cart() {
                     <Typography>Shipping</Typography>
                   </Grid>
                   <Grid item>
-                    <Typography>${shipping.toFixed(2)}</Typography>
+                    <Typography>₹{shipping.toLocaleString()}</Typography>
                   </Grid>
                 </Grid>
                 <Grid container justifyContent="space-between" sx={{ mt: 1 }}>
                   <Grid item>
-                    <Typography>Tax</Typography>
+                    <Typography>GST (18%)</Typography>
                   </Grid>
                   <Grid item>
-                    <Typography>${tax.toFixed(2)}</Typography>
+                    <Typography>₹{tax.toLocaleString()}</Typography>
                   </Grid>
                 </Grid>
               </Box>
@@ -201,13 +172,12 @@ function Cart() {
                     <Typography variant="h6">Total</Typography>
                   </Grid>
                   <Grid item>
-                    <Typography variant="h6">${total.toFixed(2)}</Typography>
+                    <Typography variant="h6">₹{total.toLocaleString()}</Typography>
                   </Grid>
                 </Grid>
               </Box>
               <Button
-                component={RouterLink}
-                to="/payment"
+                onClick={() => navigate('/checkout?source=cart')}
                 variant="contained"
                 fullWidth
                 size="large"

@@ -77,8 +77,8 @@ function Policies() {
             <Divider />
             <ListItem>
               <ListItemText
-                primary="Shipping Costs"
-                secondary="Standard Shipping is free for orders over $100. Express Shipping has additional charges based on location."
+                primary="Shipping Charges"
+                secondary="Standard Shipping is free for orders over ₹10,000. Express Shipping has additional charges based on location."
               />
             </ListItem>
             <Divider />

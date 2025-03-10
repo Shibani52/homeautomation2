@@ -11,7 +11,9 @@ import {
   Box,
   Breadcrumbs,
   Link,
+  Stack,
 } from '@mui/material';
+import { ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
 import { products } from '../data/products';
 
 const categoryTitles = {
@@ -23,6 +25,11 @@ const categoryTitles = {
 function Products() {
   const { category } = useParams();
   const filteredProducts = products.filter(product => product.category === category);
+
+  const handleAddToCart = (productId) => {
+    console.log(`Added product ${productId} to cart`);
+    // Implement cart functionality here
+  };
 
   return (
     <Box sx={{ width: '100%', p: 3 }}>
@@ -71,15 +78,42 @@ function Products() {
                   <Typography variant="body2" color="text.secondary" gutterBottom>
                     {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
                   </Typography>
-                  <Button
-                    component={RouterLink}
-                    to={`/product/${product.id}`}
-                    variant="contained"
-                    fullWidth
-                    sx={{ mt: 2 }}
-                  >
-                    View Details
-                  </Button>
+                  <Stack direction="column" spacing={1} sx={{ mt: 2 }}>
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      startIcon={<ShoppingCartIcon />}
+                      onClick={() => handleAddToCart(product.id)}
+                      disabled={product.stock === 0}
+                      sx={{
+                        bgcolor: '#2E7D32',
+                        '&:hover': {
+                          bgcolor: '#1B5E20',
+                        },
+                        textTransform: 'none',
+                      }}
+                    >
+                      Cart
+                    </Button>
+                    <Button
+                      component={RouterLink}
+                      to={`/product/${product.id}`}
+                      variant="outlined"
+                      fullWidth
+                      disabled={product.stock === 0}
+                      sx={{
+                        borderColor: '#2E7D32',
+                        color: '#2E7D32',
+                        '&:hover': {
+                          borderColor: '#1B5E20',
+                          bgcolor: 'grey.50',
+                        },
+                        textTransform: 'none',
+                      }}
+                    >
+                      Buy Now
+                    </Button>
+                  </Stack>
                 </Box>
               </CardContent>
             </Card>

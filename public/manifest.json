@@ -1,0 +1,16 @@
+{
+  "name": "Smart Home Hub",
+  "short_name": "Smart Home",
+  "description": "Your one-stop shop for home automation solutions",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2E7D32",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+} 

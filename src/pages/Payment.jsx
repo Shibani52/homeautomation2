@@ -182,7 +182,7 @@ function Payment() {
           <FormControlLabel
             value="express"
             control={<Radio />}
-            label="Express Shipping (2-3 business days) - $14.99"
+            label="Express Shipping (2-3 business days) - ₹999"
           />
         </RadioGroup>
       </Grid>
@@ -272,28 +272,28 @@ function Payment() {
           <Typography>Subtotal</Typography>
         </Grid>
         <Grid item xs={6}>
-          <Typography align="right">$189.97</Typography>
+          <Typography align="right">₹14,999</Typography>
         </Grid>
         <Grid item xs={6}>
           <Typography>Shipping</Typography>
         </Grid>
         <Grid item xs={6}>
           <Typography align="right">
-            {shippingMethod === 'express' ? '$14.99' : 'Free'}
+            {shippingMethod === 'express' ? '₹999' : 'Free'}
           </Typography>
         </Grid>
         <Grid item xs={6}>
-          <Typography>Tax</Typography>
+          <Typography>GST (18%)</Typography>
         </Grid>
         <Grid item xs={6}>
-          <Typography align="right">$19.00</Typography>
+          <Typography align="right">₹2,700</Typography>
         </Grid>
         <Grid item xs={6}>
           <Typography variant="h6">Total</Typography>
         </Grid>
         <Grid item xs={6}>
           <Typography variant="h6" align="right">
-            ${shippingMethod === 'express' ? '223.96' : '208.97'}
+            ₹{shippingMethod === 'express' ? '18,698' : '17,699'}
           </Typography>
         </Grid>
       </Grid>
