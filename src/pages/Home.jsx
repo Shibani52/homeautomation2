@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowForward, Lightbulb, Security, Thermostat, Speed, TouchApp, PhoneAndroid } from '@mui/icons-material';
 import { products } from '../data/products';
+import OfferSlider from '../components/OfferSlider';
+import ProductOfferSlider from '../components/ProductOfferSlider';
 
 // Get one featured product from each category
 const featuredProducts = [
@@ -9,6 +11,46 @@ const featuredProducts = [
   products.find(p => p.category === 'security' && p.id === 'ss1'), // Smart Security Camera
   products.find(p => p.category === 'climate' && p.id === 'cc1'), // Smart Thermostat
 ];
+
+// Get products by category for sliders
+const lightingProducts = products
+  .filter(p => p.category === 'smart-lighting')
+  .map(p => ({
+    ...p,
+    rating: p.reviews ? p.reviews.reduce((acc, r) => acc + r.rating, 0) / p.reviews.length : 4.5,
+    reviewCount: p.reviews ? p.reviews.length : Math.floor(Math.random() * 100) + 10,
+    discount: p.onSale ? `${Math.floor((1 - (p.price / p.originalPrice)) * 100)}% OFF` : null
+  }));
+
+const securityProducts = products
+  .filter(p => p.category === 'security')
+  .map(p => ({
+    ...p,
+    rating: p.reviews ? p.reviews.reduce((acc, r) => acc + r.rating, 0) / p.reviews.length : 4.5,
+    reviewCount: p.reviews ? p.reviews.length : Math.floor(Math.random() * 100) + 10,
+    discount: p.onSale ? `${Math.floor((1 - (p.price / p.originalPrice)) * 100)}% OFF` : null
+  }));
+
+const climateProducts = products
+  .filter(p => p.category === 'climate')
+  .map(p => ({
+    ...p,
+    rating: p.reviews ? p.reviews.reduce((acc, r) => acc + r.rating, 0) / p.reviews.length : 4.5,
+    reviewCount: p.reviews ? p.reviews.length : Math.floor(Math.random() * 100) + 10,
+    discount: p.onSale ? `${Math.floor((1 - (p.price / p.originalPrice)) * 100)}% OFF` : null
+  }));
+
+// Get top deals - products with highest discount
+const topDeals = products
+  .filter(p => p.onSale && p.originalPrice)
+  .sort((a, b) => (1 - (a.price / a.originalPrice)) - (1 - (b.price / b.originalPrice)))
+  .slice(0, 10)
+  .map(p => ({
+    ...p,
+    rating: p.reviews ? p.reviews.reduce((acc, r) => acc + r.rating, 0) / p.reviews.length : 4.5,
+    reviewCount: p.reviews ? p.reviews.length : Math.floor(Math.random() * 100) + 10,
+    discount: `${Math.floor((1 - (p.price / p.originalPrice)) * 100)}% OFF`
+  }));
 
 // Testimonials data
 const testimonials = [
@@ -77,258 +119,226 @@ function Home() {
   };
 
   return (
-    <div className="w-full">
-      {/* Hero Section */}
-      <div 
-        className={`relative bg-gradient-to-br from-gray-900 via-gray-800 to-primary-dark text-white min-h-[600px] md:min-h-[650px] flex items-center w-full transition-opacity duration-1000 ${animateHero ? 'opacity-100' : 'opacity-0'}`}
-      >
-        {/* Background Image with Overlay */}
-        <div 
-          className="absolute inset-0 z-0 opacity-40 mix-blend-overlay"
-          style={{
-            backgroundImage: 'url(https://images.unsplash.com/photo-1558002038-1055907df827?ixlib=rb-4.0.3)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
+    <div className="bg-gray-50">
+      {/* Main Banner Slider */}
+      <section className="w-full">
+        <OfferSlider />
+      </section>
 
-        {/* Content */}
-        <div className="container mx-auto px-4 z-10">
-          <div className="max-w-2xl relative stagger-animation">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white leading-tight animate-slide-left hover:scale-105 transition-transform cursor-pointer">
-              Transform Your Home 
-              <span className="block mt-2 text-primary-light">with Smart Technology</span>
-            </h1>
-            
-            <p className="text-lg md:text-xl mb-8 text-gray-100 leading-relaxed max-w-xl animate-slide-left">
-              Discover our range of cutting-edge smart devices for lighting, security, and climate control.
-              Make your home more efficient, secure, and comfortable.
+      {/* Top Deals Slider */}
+      <section className="container mx-auto px-4 mt-8">
+        <ProductOfferSlider 
+          title="Top Deals" 
+          products={topDeals} 
+          bgColor="#FFF8E1" 
+          titleColor="#FF9800"
+        />
+      </section>
+
+      {/* Transform Your Home Section */}
+      <section className="bg-gray-900 text-white py-16 mt-8">
+        <div className="container mx-auto px-4">
+          <div className="max-w-2xl">
+            <h2 className="text-4xl font-bold mb-4">
+              Transform Your Home
+              <span className="block text-green-400">with Smart Technology</span>
+            </h2>
+            <p className="text-lg mb-8 text-gray-300">
+              Discover our range of cutting-edge smart devices for
+              lighting, security, and climate control. Make your home
+              more efficient, secure, and comfortable.
             </p>
-            
-            <div className="flex flex-wrap gap-4 animate-slide-up">
+            <div className="flex flex-wrap gap-4">
               <Link
                 to="/catalog"
-                className="group bg-primary hover:bg-primary-light text-white px-8 py-4 rounded-lg font-medium flex items-center transition-all hover:-translate-y-1 hover:shadow-lg relative overflow-hidden button-hover"
+                className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-full transition duration-300 inline-flex items-center"
               >
-                <span className="relative z-10">Shop Now</span>
-                <ArrowForward className="ml-2 w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
+                Shop Now <ArrowForward className="ml-2" />
               </Link>
-              
               <Link
                 to="/about"
-                className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white border border-white/30 px-8 py-4 rounded-lg font-medium transition-all hover:-translate-y-1 hover:shadow-lg flex items-center button-hover"
+                className="bg-transparent hover:bg-white/10 text-white border border-white font-bold py-3 px-6 rounded-full transition duration-300 inline-flex items-center"
               >
-                Learn More
-                <ArrowForward className="ml-2 w-5 h-5" />
+                Learn More <ArrowForward className="ml-2" />
               </Link>
             </div>
-
-            {/* Feature Tags */}
-            <div className="mt-12 flex flex-wrap gap-4 stagger-animation">
-              <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-sm text-white flex items-center animate-fade-in hover-scale">
-                <span className="w-2 h-2 bg-green-400 rounded-full mr-2" />
-                Smart Control
+            <div className="flex flex-wrap gap-8 mt-10">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span className="text-sm">Smart Control</span>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-sm text-white flex items-center animate-fade-in hover-scale">
-                <span className="w-2 h-2 bg-yellow-400 rounded-full mr-2" />
-                Energy Efficient
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span className="text-sm">Energy Efficient</span>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-sm text-white flex items-center animate-fade-in hover-scale">
-                <span className="w-2 h-2 bg-blue-400 rounded-full mr-2" />
-                24/7 Security
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span className="text-sm">24/7 Security</span>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Benefits Section */}
-      <div className="py-20 bg-white">
+      {/* Smart Lighting Slider */}
+      <section className="container mx-auto px-4 mt-12">
+        <ProductOfferSlider 
+          title="Smart Lighting" 
+          products={lightingProducts} 
+          bgColor="#E8F5E9" 
+          titleColor="#2E7D32"
+        />
+      </section>
+
+      {/* Security Products Slider */}
+      <section className="container mx-auto px-4 mt-12">
+        <ProductOfferSlider 
+          title="Security Systems" 
+          products={securityProducts} 
+          bgColor="#E3F2FD" 
+          titleColor="#1565C0"
+        />
+      </section>
+
+      {/* Why Choose Us Section */}
+      <section className="py-16 mt-8 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 animate-fade-in hover:scale-105 hover:text-primary transition-all duration-300 cursor-pointer">
-            Why Choose Smart Home Hub?
-          </h2>
-          <p className="text-gray-600 text-center max-w-2xl mx-auto mb-16 animate-fade-in">
+          <h2 className="text-3xl font-bold text-center mb-12">Why Choose Smart Home Hub?</h2>
+          <p className="text-center text-gray-600 max-w-3xl mx-auto mb-12">
             We provide innovative solutions that make your home smarter, safer, and more efficient.
           </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 stagger-animation">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {benefits.map((benefit, index) => (
-              <div 
-                key={index}
-                className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-all hover:-translate-y-2 text-center border border-gray-100 animate-scale-in card-hover"
-              >
-                <div className="bg-primary/10 text-primary rounded-full p-4 w-16 h-16 flex items-center justify-center mx-auto mb-6 animate-float">
-                  {benefit.icon}
+              <div key={index} className="text-center p-6 rounded-lg hover:shadow-lg transition-shadow">
+                <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="text-green-600">{benefit.icon}</div>
                 </div>
-                <h3 className="text-xl font-semibold mb-3 hover:text-primary transition-colors duration-300 cursor-pointer">
-                  {benefit.title}
-                </h3>
+                <h3 className="text-xl font-semibold mb-2">{benefit.title}</h3>
                 <p className="text-gray-600">{benefit.description}</p>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Climate Control Slider */}
+      <section className="container mx-auto px-4 mt-12">
+        <ProductOfferSlider 
+          title="Climate Control" 
+          products={climateProducts} 
+          bgColor="#F3E5F5" 
+          titleColor="#6A1B9A"
+        />
+      </section>
 
       {/* Featured Products Section */}
-      <div className="py-20 bg-gray-50">
+      <section className="py-16 mt-8 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3 animate-fade-in hover:scale-105 hover:text-primary transition-all duration-300 cursor-pointer">
-              Featured Products
-            </h2>
-            <p className="text-gray-600 mx-auto max-w-2xl animate-fade-in">
-              Discover our most popular smart home solutions
-            </p>
-          </div>
-
-          {/* Products Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 stagger-animation">
-            {featuredProducts.map((product, index) => (
-              <div
-                key={product.id}
-                className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all hover:-translate-y-2 animate-scale-in"
+          <h2 className="text-3xl font-bold text-center mb-2">Featured Products</h2>
+          <p className="text-center text-gray-600 mb-12">Discover our most popular smart home solutions</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {featuredProducts.map((product) => (
+              <div 
+                key={product.id} 
+                className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow h-[450px] flex flex-col"
               >
-                <Link
-                  to={`/product/${product.id}`}
-                  className="block"
-                >
-                  <div className="relative aspect-w-16 aspect-h-9">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-64 object-cover transform group-hover:scale-105 transition-transform duration-300"
-                    />
-                    {product.isNew && (
-                      <div className="absolute top-4 left-4 bg-primary text-white text-sm font-semibold px-3 py-1 rounded-full">
-                        New
-                      </div>
-                    )}
+                <div className="relative h-64">
+                  <img 
+                    src={product.image} 
+                    alt={product.name} 
+                    className="w-full h-full object-contain bg-white p-4"
+                  />
+                  {product.isNew && (
+                    <span className="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded shadow-sm">NEW</span>
+                  )}
+                  {product.onSale && (
+                    <span className="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded shadow-sm min-w-[60px] text-center">SALE</span>
+                  )}
+                </div>
+                <div className="p-6 flex flex-col flex-grow">
+                  <h3 className="font-bold text-xl mb-2 line-clamp-2 h-14">{product.name}</h3>
+                  <div className="flex items-center mb-4">
+                    <div className="flex text-yellow-400">
+                      {renderRating(product.rating || 4.5)}
+                    </div>
+                    <span className="text-gray-500 text-sm ml-2">
+                      ({product.reviews ? product.reviews.length : Math.floor(Math.random() * 100) + 10})
+                    </span>
                   </div>
-                  
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors duration-300">
-                      {product.name}
-                    </h3>
-                    <p className="text-gray-600 mb-4 line-clamp-2">
-                      {product.description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-primary">
-                        ₹{product.price.toLocaleString()}
-                      </span>
-                      <div className="flex items-center">
-                        {renderRating(product.rating)}
-                      </div>
+                  <div className="flex items-center justify-between mt-auto">
+                    <div>
+                      <span className="text-2xl font-bold text-gray-900">₹{product.price.toLocaleString()}</span>
+                      {product.originalPrice && (
+                        <span className="text-sm text-gray-500 line-through ml-2">
+                          ₹{product.originalPrice.toLocaleString()}
+                        </span>
+                      )}
                     </div>
                   </div>
-                </Link>
-                <div className="px-6 pb-6">
-                  <div className="flex flex-col gap-2">
-                    <Link
-                      to={`/checkout?product=${product.id}`}
-                      className="w-full bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg font-medium transition-colors duration-300 text-center"
-                    >
-                      Buy Now
-                    </Link>
+                  <div className="mt-6 grid grid-cols-2 gap-2">
                     <Link
                       to={`/product/${product.id}`}
-                      className="w-full border border-primary text-primary hover:bg-gray-50 px-4 py-2 rounded-lg font-medium transition-colors duration-300 text-center"
+                      className="text-center py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
                     >
                       View Details
                     </Link>
+                    <button
+                      className="bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors"
+                    >
+                      Buy Now
+                    </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          
-          <div className="text-center mt-12">
-            <Link
-              to="/catalog"
-              className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary hover:bg-primary-dark transition-colors"
-            >
-              View All Products
-              <ArrowForward className="ml-2 w-5 h-5" />
-            </Link>
-          </div>
         </div>
-      </div>
+      </section>
 
       {/* Testimonials Section */}
-      <div className="py-20 bg-white">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 animate-fade-in hover:scale-105 hover:text-primary transition-all duration-300 cursor-pointer">
-            What Our Customers Say
-          </h2>
-          <p className="text-gray-600 text-center max-w-2xl mx-auto mb-16 animate-fade-in">
-            Read testimonials from our satisfied customers
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 stagger-animation">
+          <h2 className="text-3xl font-bold text-center mb-12">What Our Customers Say</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <div 
-                key={index}
-                className="bg-gray-50 p-8 rounded-xl border border-gray-100 hover:shadow-md transition-all animate-scale-in card-hover"
-              >
+              <div key={index} className="bg-gray-50 p-6 rounded-lg shadow-sm">
                 <div className="flex items-center mb-4">
-                  <img 
-                    src={testimonial.image} 
+                  <img
+                    src={testimonial.image}
                     alt={testimonial.name}
-                    className="w-14 h-14 rounded-full object-cover mr-4 border-2 border-primary"
+                    className="w-12 h-12 rounded-full mr-4 object-cover"
                   />
                   <div>
-                    <h3 className="font-semibold text-lg animate-fade-in hover:text-primary transition-colors duration-300 cursor-pointer">
-                      {testimonial.name}
-                    </h3>
-                    <p className="text-gray-600 text-sm">{testimonial.role}</p>
+                    <h3 className="font-semibold">{testimonial.name}</h3>
+                    <p className="text-sm text-gray-600">{testimonial.role}</p>
                   </div>
                 </div>
-                
-                <div className="flex mb-3">
+                <div className="flex text-yellow-400 mb-3">
                   {renderRating(testimonial.rating)}
                 </div>
-                
                 <p className="text-gray-700 italic">"{testimonial.comment}"</p>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Categories Section */}
-      <div className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-3 animate-fade-in hover:scale-105 hover:text-primary transition-all duration-300 cursor-pointer">
-            Browse Categories
-          </h2>
-          <p className="text-gray-600 text-center max-w-2xl mx-auto mb-16 animate-fade-in">
-            Explore our range of smart home solutions by category
+      {/* CTA Section */}
+      <section className="bg-green-600 text-white py-16">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Home?</h2>
+          <p className="max-w-2xl mx-auto mb-8">
+            Start your smart home journey today with our cutting-edge products and solutions.
           </p>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 stagger-animation">
-            <CategoryCard 
-              title="Smart Lighting" 
-              icon={<Lightbulb className="w-6 h-6" />}
-              image="https://source.unsplash.com/random/?smartlighting"
-              path="/products/smart-lighting"
-            />
-            <CategoryCard 
-              title="Security Systems" 
-              icon={<Security className="w-6 h-6" />}
-              image="https://source.unsplash.com/random/?homesecurity"
-              path="/products/security"
-            />
-            <CategoryCard 
-              title="Climate Control" 
-              icon={<Thermostat className="w-6 h-6" />}
-              image="https://source.unsplash.com/random/?thermostat"
-              path="/products/climate"
-            />
-          </div>
+          <Link
+            to="/catalog"
+            className="bg-white text-green-600 font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition-colors inline-block"
+          >
+            Shop Now
+          </Link>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
