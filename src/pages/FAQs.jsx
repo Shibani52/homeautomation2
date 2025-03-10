@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { 
   Container, 
   Typography, 
@@ -6,14 +6,14 @@ import {
   AccordionSummary, 
   AccordionDetails, 
   Box, 
-  Divider, 
   Paper, 
   TextField, 
   InputAdornment, 
   IconButton,
   Chip,
   Grid,
-  Link
+  Link,
+  Divider
 } from '@mui/material';
 import { 
   ExpandMore as ExpandMoreIcon, 
@@ -24,8 +24,9 @@ import {
   Security as SecurityIcon,
   Devices as DevicesIcon,
   Build as InstallationIcon,
-  ContactSupport as SupportIcon,
-  Clear as ClearIcon
+  ContactSupport,
+  Clear as ClearIcon,
+  QuestionAnswer as QuestionIcon
 } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -218,6 +219,21 @@ const FAQs = () => {
     return matchesSearch && matchesCategory;
   });
 
+  // Group FAQs by category for Amazon/Flipkart style display
+  const groupedFaqs = {};
+  
+  if (activeCategory === 'all') {
+    // Group by category when showing all
+    categories.forEach(category => {
+      if (category.id !== 'all') {
+        groupedFaqs[category.id] = filteredFaqs.filter(faq => faq.category === category.id);
+      }
+    });
+  } else {
+    // Just use the active category
+    groupedFaqs[activeCategory] = filteredFaqs;
+  }
+
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>
       <Typography variant="h3" component="h1" gutterBottom align="center" sx={{ fontWeight: 'bold', color: '#2E7D32' }}>
@@ -284,53 +300,85 @@ const FAQs = () => {
         ))}
       </Box>
       
-      {/* FAQ Accordions */}
-      <Box sx={{ mb: 6 }}>
-        {filteredFaqs.length > 0 ? (
-          filteredFaqs.map((faq) => (
-            <Accordion
-              key={faq.id}
-              expanded={expanded === faq.id}
-              onChange={handleChange(faq.id)}
-              sx={{
-                mb: 1,
-                '&:before': {
-                  display: 'none',
-                },
-                '&.Mui-expanded': {
-                  boxShadow: '0 4px 6px rgba(0,0,0,0.05)',
-                },
-              }}
-            >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                sx={{
-                  '&.Mui-expanded': {
-                    borderBottom: '1px solid',
-                    borderColor: 'divider',
-                  },
-                }}
-              >
-                <Typography sx={{ fontWeight: 500 }}>{faq.question}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography sx={{ color: 'text.secondary' }}>
-                  {faq.answer}
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
-          ))
-        ) : (
-          <Paper elevation={0} sx={{ p: 4, textAlign: 'center', bgcolor: '#f5f5f5' }}>
-            <Typography variant="h6" gutterBottom>No FAQs found</Typography>
-            <Typography variant="body2" color="text.secondary">
-              Try adjusting your search or category filter
-            </Typography>
-          </Paper>
-        )}
-      </Box>
+      {/* Amazon/Flipkart Style FAQ Sections */}
+      {Object.keys(groupedFaqs).length > 0 ? (
+        Object.keys(groupedFaqs).map(categoryId => {
+          const categoryFaqs = groupedFaqs[categoryId];
+          if (categoryFaqs.length === 0) return null;
+          
+          const categoryInfo = categories.find(c => c.id === categoryId);
+          
+          return (
+            <Box key={categoryId} sx={{ mb: 5 }}>
+              {/* Category Header - Only show in "All" view */}
+              {activeCategory === 'all' && (
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <Box sx={{ 
+                    bgcolor: '#E8F5E9', 
+                    p: 1, 
+                    borderRadius: '50%',
+                    display: 'flex',
+                    mr: 2
+                  }}>
+                    {React.cloneElement(categoryInfo.icon, { sx: { color: '#2E7D32' } })}
+                  </Box>
+                  <Typography variant="h5" sx={{ fontWeight: 500, color: '#2E7D32' }}>
+                    {categoryInfo.label}
+                  </Typography>
+                </Box>
+              )}
+              
+              {/* Category FAQs */}
+              <Paper elevation={0} sx={{ mb: 3, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
+                {categoryFaqs.map((faq, index) => (
+                  <React.Fragment key={faq.id}>
+                    <Accordion
+                      expanded={expanded === faq.id}
+                      onChange={handleChange(faq.id)}
+                      disableGutters
+                      elevation={0}
+                      sx={{
+                        '&:before': { display: 'none' },
+                        borderBottom: index < categoryFaqs.length - 1 ? '1px solid rgba(0, 0, 0, 0.08)' : 'none',
+                      }}
+                    >
+                      <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        sx={{ 
+                          px: 3,
+                          py: 1.5,
+                          '&.Mui-expanded': {
+                            bgcolor: 'rgba(46, 125, 50, 0.04)',
+                          }
+                        }}
+                      >
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <QuestionIcon sx={{ color: '#2E7D32', mr: 2, fontSize: 20, opacity: 0.8 }} />
+                          <Typography sx={{ fontWeight: 500 }}>{faq.question}</Typography>
+                        </Box>
+                      </AccordionSummary>
+                      <AccordionDetails sx={{ px: 3, py: 2, bgcolor: 'rgba(46, 125, 50, 0.02)' }}>
+                        <Typography sx={{ pl: 5, color: 'text.secondary' }}>
+                          {faq.answer}
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                  </React.Fragment>
+                ))}
+              </Paper>
+            </Box>
+          );
+        })
+      ) : (
+        <Paper elevation={0} sx={{ p: 4, textAlign: 'center', bgcolor: '#f5f5f5' }}>
+          <Typography variant="h6" gutterBottom>No FAQs found</Typography>
+          <Typography variant="body2" color="text.secondary">
+            Try adjusting your search or category filter
+          </Typography>
+        </Paper>
+      )}
       
-      {/* Still Have Questions Section */}
+      {/* Help Section */}
       <Paper 
         elevation={0} 
         sx={{ 
@@ -338,7 +386,8 @@ const FAQs = () => {
           bgcolor: '#E8F5E9', 
           borderRadius: 2,
           border: '1px solid',
-          borderColor: '#C8E6C9'
+          borderColor: '#C8E6C9',
+          mt: 6
         }}
       >
         <Grid container spacing={3} alignItems="center">
@@ -357,24 +406,24 @@ const FAQs = () => {
                   sx={{ bgcolor: '#2E7D32', '&:hover': { bgcolor: '#1B5E20' } }} 
                 />
               </Link>
-              <Chip 
-                label="Live Chat" 
-                variant="outlined" 
-                sx={{ borderColor: '#2E7D32', color: '#2E7D32' }} 
-                onClick={() => document.querySelector('[aria-label="chat"]').click()}
-              />
-              <Chip 
-                label="Email Support" 
-                variant="outlined" 
-                sx={{ borderColor: '#2E7D32', color: '#2E7D32' }} 
-                component="a"
-                href="mailto:support@smarthome.com"
-                clickable
-              />
+              <Link component="a" href="mailto:support@smarthome.com" underline="none">
+                <Chip 
+                  label="Email Support" 
+                  variant="outlined" 
+                  sx={{ borderColor: '#2E7D32', color: '#2E7D32' }} 
+                />
+              </Link>
+              <Link component="a" href="tel:+918000000000" underline="none">
+                <Chip 
+                  label="Call Us" 
+                  variant="outlined" 
+                  sx={{ borderColor: '#2E7D32', color: '#2E7D32' }} 
+                />
+              </Link>
             </Box>
           </Grid>
           <Grid item xs={12} md={4} sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'center' }}>
-            <SupportIcon sx={{ fontSize: 100, color: '#2E7D32', opacity: 0.8 }} />
+            <ContactSupport sx={{ fontSize: 100, color: '#2E7D32', opacity: 0.8 }} />
           </Grid>
         </Grid>
       </Paper>
