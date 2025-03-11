@@ -20,7 +20,7 @@ import {
 } from '@mui/icons-material';
 
 // Simple chatbot component
-const AIAssistant = () => {
+const SmartAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     { 
@@ -70,28 +70,28 @@ const AIAssistant = () => {
   }, [messages]);
 
   const generateResponse = (query) => {
-    console.log("Generating response for:", query);
+    console.log("SmartAssistant - Generating response for:", query);
     setIsTyping(true);
     
     // Simulate API delay
     setTimeout(() => {
       const lowercaseQuery = query.toLowerCase();
-      console.log("Lowercase query:", lowercaseQuery);
+      console.log("SmartAssistant - Lowercase query:", lowercaseQuery);
       
       // Default response
       let response = "I'm not sure I understand. Could you please rephrase your question?";
       
       // Check each key in the responseMap
       for (const [key, value] of Object.entries(responseMap)) {
-        console.log("Checking key:", key);
+        console.log("SmartAssistant - Checking key:", key);
         if (lowercaseQuery.includes(key)) {
-          console.log("Match found for key:", key);
+          console.log("SmartAssistant - Match found for key:", key);
           response = value;
           break;
         }
       }
       
-      console.log("Final response:", response);
+      console.log("SmartAssistant - Final response:", response);
       
       setMessages(prev => [...prev, {
         id: prev.length + 2,
@@ -131,7 +131,7 @@ const AIAssistant = () => {
     <>
       {/* Chat Button */}
       <Zoom in={true}>
-        <Tooltip title={isOpen ? "Close Assistant" : "AI Smart Home Assistant"} placement="left">
+        <Tooltip title={isOpen ? "Close Assistant" : "Smart Home Assistant"} placement="left">
           <Fab
             color="primary"
             aria-label="chat"
@@ -180,7 +180,7 @@ const AIAssistant = () => {
               justifyContent: 'space-between'
             }}
           >
-            <Typography variant="h6">AI Smart Home Assistant</Typography>
+            <Typography variant="h6">Smart Home Assistant</Typography>
             <IconButton size="small" onClick={toggleChat} sx={{ color: 'white' }}>
               <CloseIcon />
             </IconButton>
@@ -240,7 +240,7 @@ const AIAssistant = () => {
               <Box sx={{ display: 'flex', alignItems: 'center', ml: 5 }}>
                 <CircularProgress size={16} sx={{ mr: 1, color: '#2E7D32' }} />
                 <Typography variant="body2" color="text.secondary">
-                  AI Assistant is thinking...
+                  Assistant is thinking...
                 </Typography>
               </Box>
             )}
@@ -290,4 +290,4 @@ const AIAssistant = () => {
   );
 };
 
-export default AIAssistant; 
+export default SmartAssistant; 

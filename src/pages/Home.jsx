@@ -249,7 +249,7 @@ function Home() {
                     alt={product.name} 
                     className="w-full h-full object-contain bg-white p-4"
                   />
-                  {product.isNew && (
+                  {product.isNewProduct && (
                     <span className="absolute top-4 left-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded shadow-sm">NEW</span>
                   )}
                   {product.onSale && (

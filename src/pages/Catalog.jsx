@@ -438,7 +438,7 @@ function Catalog() {
                               Sale
                             </span>
                           )}
-                          {product.isNew && (
+                          {product.isNewProduct && (
                             <span className="bg-primary text-white text-xs font-bold px-2 py-1 rounded">
                               New
                             </span>

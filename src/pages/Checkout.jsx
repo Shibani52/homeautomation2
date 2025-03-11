@@ -22,7 +22,7 @@ function Checkout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { cartItems, getCartTotal } = useCart();
+  const { cartItems, getCartTotal, clearCart } = useCart();
   
   // Redirect to login if not authenticated
   if (!user) {
@@ -116,25 +116,108 @@ function Checkout() {
       return;
     }
 
+    if (!user || !user.token) {
+      alert("You need to be logged in to complete this purchase.");
+      navigate('/login', { state: { from: location } });
+      return;
+    }
+
     const params = new URLSearchParams(location.search);
     const source = params.get('source');
     const total = source === 'cart' ? getCartTotal() : (product ? product.price : 0);
 
-    // Show a mock payment modal
-    const confirmed = window.confirm(
-      `Proceed with payment of ₹${total.toLocaleString()}?\n\n` +
-      `This is a mock payment for testing purposes.`
-    );
-
-    if (confirmed) {
-      // Simulate payment processing
+    try {
+      // Show loading message
       alert("Processing payment...");
       
-      // Simulate a successful payment after a short delay
-      setTimeout(() => {
+      // Prepare order data
+      const orderItems = source === 'cart' 
+        ? cartItems.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            image: item.image,
+            price: item.price,
+            product: item.id
+          }))
+        : [{
+            name: product.name,
+            quantity: 1,
+            image: product.image,
+            price: product.price,
+            product: product.id
+          }];
+      
+      const shippingAddress = {
+        addressType: 'Home',
+        street: formData.address,
+        city: formData.city,
+        state: formData.state || 'State',
+        zipCode: formData.zipCode,
+        country: 'India'
+      };
+      
+      const orderData = {
+        orderItems,
+        shippingAddress,
+        paymentMethod: 'mock_payment',
+        itemsPrice: total,
+        taxPrice: 0,
+        shippingPrice: 0,
+        totalPrice: total
+      };
+      
+      console.log('Sending order data:', orderData);
+      console.log('User token:', user.token);
+      
+      // Define the API URL
+      const apiUrl = 'http://localhost:5000/api/payments/mock';
+      console.log('API URL:', apiUrl);
+      
+      // Call the mock payment API
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        },
+        body: JSON.stringify({ orderData })
+      });
+      
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      
+      // Check if response is ok before parsing JSON
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Server responded with ${response.status}: ${errorText || 'No error details'}`);
+      }
+      
+      // Check if response has content before parsing JSON
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+      
+      if (!responseText) {
+        throw new Error('Empty response from server');
+      }
+      
+      const data = JSON.parse(responseText);
+      console.log('Payment response data:', data);
+      
+      if (data.success) {
+        // Clear cart if payment was from cart
+        if (source === 'cart') {
+          clearCart();
+        }
+        
         alert("Payment successful! Order confirmed.");
-        navigate('/order-confirmation');
-      }, 1500);
+        navigate('/order-confirmation', { state: { orderId: data.order._id } });
+      } else {
+        alert(`Payment failed: ${data.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert(`Payment failed. Please try again. Error: ${error.message || 'Unknown error'}`);
     }
   };
 

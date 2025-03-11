@@ -51,7 +51,7 @@ export const products = [
     stock: 50,
     rating: 4.7,
     reviewCount: 128,
-    isNew: true
+    isNewProduct: true
   },
   {
     id: 'sl2',
@@ -105,7 +105,8 @@ export const products = [
     rating: 4.5,
     reviewCount: 95,
     onSale: true,
-    originalPrice: 4499
+    originalPrice: 4499,
+    isNewProduct: true
   },
   {
     id: 'sl3',
@@ -157,7 +158,8 @@ export const products = [
     ],
     stock: 25,
     rating: 4.3,
-    reviewCount: 72
+    reviewCount: 72,
+    isNewProduct: true
   },
 
   // Security Systems Category
@@ -212,7 +214,7 @@ export const products = [
     stock: 40,
     rating: 4.6,
     reviewCount: 156,
-    isNew: true
+    isNewProduct: true
   },
   {
     id: 'ss2',
@@ -239,6 +241,7 @@ export const products = [
     reviewCount: 89,
     modelUrl: '/models/smart-lock.glb',
     has3DModel: true,
+    isNewProduct: true
   },
   {
     id: 'ss3',
@@ -264,7 +267,8 @@ export const products = [
     rating: 4.4,
     reviewCount: 112,
     onSale: true,
-    originalPrice: 13499
+    originalPrice: 13499,
+    isNewProduct: true
   },
 
   // Climate Control Category
@@ -291,7 +295,7 @@ export const products = [
     stock: 45,
     rating: 4.9,
     reviewCount: 203,
-    isNew: true
+    isNewProduct: true
   },
   {
     id: 'cc2',
@@ -315,7 +319,8 @@ export const products = [
     ],
     stock: 15,
     rating: 4.7,
-    reviewCount: 78
+    reviewCount: 78,
+    isNewProduct: true
   },
   {
     id: 'cc3',
@@ -341,6 +346,7 @@ export const products = [
     rating: 4.5,
     reviewCount: 64,
     onSale: true,
-    originalPrice: 8249
+    originalPrice: 8249,
+    isNewProduct: true
   }
 ]; 

@@ -22,11 +22,16 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     try {
       // Mock login - replace with actual API call
+      // Generate a mock token
+      const mockToken = 'mock_token_' + Math.random().toString(36).substring(2, 15);
+      
       const mockUser = {
         id: '1',
         email: email,
         name: 'Demo User',
-        avatar: 'https://ui-avatars.com/api/?name=Demo+User'
+        avatar: 'https://ui-avatars.com/api/?name=Demo+User',
+        token: mockToken,
+        role: 'user'
       };
       
       setUser(mockUser);

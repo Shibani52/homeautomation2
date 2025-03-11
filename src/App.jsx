@@ -2,7 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
-import AIAssistant from './components/AIAssistant';
+// import AIAssistant from './components/AIAssistant';
+// import SmartAssistant from './components/SmartAssistant';
+import BasicChatbot from './components/BasicChatbot';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import ProductDetails from './pages/ProductDetails';
@@ -58,7 +60,7 @@ function App() {
               </Routes>
             </main>
             <Footer />
-            <AIAssistant />
+            <BasicChatbot />
           </div>
         </Router>
       </CartProvider>

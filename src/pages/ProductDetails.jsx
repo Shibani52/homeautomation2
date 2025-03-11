@@ -415,7 +415,7 @@ function ProductDetails() {
                   </div>
 
                   {/* Labels */}
-                  {product.isNew && (
+                  {product.isNewProduct && (
                     <Chip
                       label="New"
                       color="primary"
@@ -923,7 +923,7 @@ function ProductDetails() {
                     alt={rec.name}
                     className="absolute top-0 left-0 w-full h-full object-cover"
                   />
-                  {rec.isNew && (
+                  {rec.isNewProduct && (
                     <Chip
                       label="New"
                       color="primary"
